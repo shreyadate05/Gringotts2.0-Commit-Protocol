@@ -15,7 +15,6 @@
 #include <pthread.h>
 #include <vector>
 
-
 class Cohort
 {
 	SocketData socketData;

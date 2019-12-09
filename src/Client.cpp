@@ -62,7 +62,7 @@ bool Client::readCommand()
 	return res;
 }
 
-bool Client::parseCommand(string sCommand, vector<string> vCommand)
+bool Client::parseCommand()
 {
 	bool res = true;
 
@@ -79,9 +79,8 @@ bool Client::runClient()
 
 	while(bKeepAlive && res)
 	{
-		vector<string> vCommand;
 		res = readCommand();
-		res = parseCommand(sCommand, vCommand);
+		res = parseCommand();
 
 		if(vCommand.size() == 0)
 		{

@@ -20,6 +20,7 @@ class Client
 {
 	SocketData socketData;
 	std::string sCommand;
+	std::vector<std::string> vCommand;
 
 	public:
 
@@ -28,7 +29,7 @@ class Client
 		bool initClient();
 
 		bool readCommand();
-		bool parseCommand(std::string sCommand, std::vector<std::string> vCommand);
+		bool parseCommand();
 		bool runClient();
 
 };

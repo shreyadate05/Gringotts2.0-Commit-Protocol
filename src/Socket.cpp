@@ -134,6 +134,21 @@ bool Socket::connect(SocketData& s)
 	return res;
 }
 
+bool Socket::closeSocket(SocketData& s)
+{
+	bool res = true;
+
+	//cout << "\n" << s.iSocket << ", " << s.iPortNum;
+	int status = close(s.iSocket);
+	if(status == -1 )
+	{
+		cout << "\n[ERROR ] " << __func__;
+		res =  false;
+	}
+
+	return res;
+}
+
 bool Socket::sendData(SocketData& s, string sData)
 {
 	bool res = true;

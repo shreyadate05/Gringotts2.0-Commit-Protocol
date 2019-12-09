@@ -9,7 +9,6 @@
 #define COORDINATOR_H_
 
 #include "SocketDefs.h"
-#include "GringottsDefs.h"
 #include "Socket.h"
 #include <pthread.h>
 #include <vector>
@@ -18,7 +17,6 @@
 class Coordinator
 {
 	SocketData socketData;
-	static std::map<long long, Account> mAccountData;
 	static pthread_mutex_t lock;
 
 	public:

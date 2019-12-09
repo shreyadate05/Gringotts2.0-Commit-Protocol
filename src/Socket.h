@@ -24,6 +24,7 @@ class Socket
 		static bool setSocketOptions(SocketData& s);
 
 		static bool connect(SocketData& s);
+		static bool closeSocket(SocketData& s);
 
 		static bool sendData(SocketData& s, std::string sData);
 		static bool recvData(SocketData& s, std::string& sData);

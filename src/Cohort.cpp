@@ -28,29 +28,26 @@ bool Cohort::parseCommand()
 	char cDeLim = ' ';
 	vCommands.clear();
 	vCommands = StringUtilities::StringSplitByDelim(sCommand, cDeLim);
+	if (vCommands.size() == 0)
+	{
+		cout << "\n[ERROR ] Invalid command " << sCommand.c_str();
+		return false;
+	}
+
 	std::transform(vCommands[0].begin(), vCommands[0].end(), vCommands[0].begin(), ::toupper);
 
-	switch(vCommands[0])
-	{
-		case "CREATE":
-			res = create();
-			break;
 
-		case "UPDATE":
-			res = update();
-			break;
+	if(vCommands[0].c_str() == "CREATE")
+		res = create();
 
-		case "QUERY":
-			res = query();
-			break;
+	else if (vCommands[0].c_str() == "UPDATE")
+		res = update();
 
-		case "QUIT":
+	else if (vCommands[0].c_str() == "QUERY")
+		res = query();
+
+	else if (vCommands[0].c_str() == "QUIT")
 			res = exit();
-			break;
-
-		default:
-			break;
-	}
 
 	res &= sendOutput();
 
@@ -73,6 +70,12 @@ bool Cohort::sendOutput()
 bool Cohort::create()
 {
 	bool res = true;
+
+	if (vCommands.size() != 2)
+	{
+		cout << "\n[ERROR ] Invalid command " << sCommand.c_str();
+		return false;
+	}
 
 	iAccountNumber++;
 	sOutput = "";
@@ -100,6 +103,24 @@ bool Cohort::update()
 {
 	bool res = true;
 
+	if (vCommands.size() != 3)
+	{
+		cout << "\n[ERROR ] Invalid command " << sCommand.c_str();
+		return false;
+	}
+
+	int iAccountId = stoi(vCommands[1]);
+	long long llAmount = stoll(vCommands[2]);
+
+	if (mAccounts.count(iAccountId) <= 0)
+	{
+		cout << "\n[ERROR ] Invalid Account ID provided";
+		return false;
+	}
+
+	mAccounts[iAccountId] = llAmount;
+	sOutput = "OK " + std::to_string(llAmount);
+
 	return res;
 }
 
@@ -107,12 +128,29 @@ bool Cohort::query()
 {
 	bool res = true;
 
+	if (vCommands.size() != 2)
+	{
+		cout << "\n[ERROR ] Invalid command " << sCommand.c_str();
+		return false;
+	}
+
+	int iAccountId = stoi(vCommands[1]);
+	if (mAccounts.count(iAccountId) <= 0)
+	{
+		cout << "\n[ERROR ] Invalid Account ID provided";
+		return false;
+	}
+
+	sOutput = "OK " + std::to_string(mAccounts[iAccountId]);
+
 	return res;
 }
 
 bool Cohort::exit()
 {
 	bool res = true;
+
+	res = Socket::closeSocket(socketData);
 
 	return res;
 }
@@ -176,6 +214,8 @@ bool Cohort::commit(SocketData& newSocket)
 bool Cohort::abort(SocketData& newSocket)
 {
 	bool res = true;
+
+	cout << "[ INFO ] Aborting transaction. ";
 
 	return res;
 }

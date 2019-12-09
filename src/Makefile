@@ -1,8 +1,8 @@
 # Makefile for the socket programming example
 #
-server_objects  = GringottsServer.o Socket.o Coordinator.o
-backend_objects = GringottsBackend.o Socket.o Cohort.o 
-client_objects  = GringottsClient.o Socket.o Client.o 
+server_objects  = GringottsServer.o Socket.o Coordinator.o StringUtilities.o
+backend_objects = GringottsBackend.o Socket.o Cohort.o StringUtilities.o
+client_objects  = GringottsClient.o Socket.o Client.o StringUtilities.o
 
 all : server client backend
 
@@ -16,6 +16,7 @@ backend: $(backend_objects)
 	g++ -pthread -o client $(backend_objects)
 	
 Socket: Socket.cpp
+StringUtilities: StringUtilities.cpp
 GringottsServer: Coordinator.cpp
 GringottsBackend: Cohort.cpp
 GringottsClient: Client.cpp
