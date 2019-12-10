@@ -23,6 +23,17 @@ int main(int argc, char* argv[])
 
 	c.setPortNum(std::stoi(argv[1]));
 
+	if (!c.initServer())
+	{
+		cout << "\n[ERROR ] Failed to initialize server.";
+		return -1;
+	}
+
+	if (!c.runServer())
+	{
+		cout << "\n[ERROR ] Something went wrong in the server.";
+		return -1;
+	}
 
 
 	std::cout << std::endl;

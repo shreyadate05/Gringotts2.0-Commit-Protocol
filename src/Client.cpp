@@ -55,20 +55,24 @@ bool Client::initClient()
 bool Client::readCommand()
 {
 	bool res = true;
+	cout << "[DEBUG ] Entry to " << __func__;
 
 	cout << "\n[ INFO ] Enter command: ";
 	cin >> sCommand;
 
+	cout << "[DEBUG ] Exit from " << __func__;
 	return res;
 }
 
 bool Client::parseCommand()
 {
 	bool res = true;
+	cout << "[DEBUG ] Entry to " << __func__;
 
 	char cDeLim = ' ';
 	vCommand = StringUtilities::StringSplitByDelim(sCommand, cDeLim);
 
+	cout << "[DEBUG ] Exit from " << __func__;
 	return res;
 }
 

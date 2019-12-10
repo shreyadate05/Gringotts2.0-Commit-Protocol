@@ -30,6 +30,7 @@ bool Coordinator::sendTransaction(string sTransaction)
 			cout << "\n[ERROR ] Failed to send transaction to server on port number " << vBackendPorts[i];
 			res &= false;
 		}
+		cout << "\n[ INFO ] Sent transaction to server on port number " << vBackendPorts[i];
 	}
 
 	return res;
@@ -47,6 +48,7 @@ bool Coordinator::sendVotingMessage()
 			cout << "\n[ERROR ] Failed to send voting message to server on port number " << vBackendPorts[i];
 			res &= false;
 		}
+		cout << "\n[ INFO ] Sent voting message to server on port number " << vBackendPorts[i];
 	}
 
 	return res;
@@ -65,6 +67,8 @@ bool Coordinator::recvVote(std::vector<bool>& vVotes)
 			cout << "\n[ERROR ] Failed to receive vote of server on port number " << vBackendPorts[i];
 			res &= true;
 		}
+		cout << "\n[ INFO ] Received vote of server on port number " << vBackendPorts[i];
+
 
 		if (sVote == "OK")
 			vVotes.push_back(true);
@@ -100,9 +104,10 @@ bool Coordinator::sendDecision(string sDecision)
 		res = Socket::sendData(vClientSockets[i], sDecision);
 		if (!res)
 		{
-			cout << "\n[ERROR ] Failed to send decison to server on port number " << vBackendPorts[i];
+			cout << "\n[ERROR ] Failed to send decision to server on port number " << vBackendPorts[i];
 			res &= true;
 		}
+		cout << "\n[ INFO ] Sent decision to server on port number " << vBackendPorts[i];
 	}
 
 	return res;
@@ -122,6 +127,8 @@ bool Coordinator::recvServerResponse(vector<string>& vServerResponses)
 			res &= true;
 		}
 		vServerResponses.push_back(sAck);
+		cout << "\n[ INFO ] Received response of server on port number " << vBackendPorts[i];
+
 	}
 
 	return res;
@@ -158,14 +165,14 @@ void* Coordinator::connection_handler(void* args)
 
 	while(true)
 	{
+		pthread_mutex_lock(&lock);
+
 		bool res = sendTransaction(*sTransaction);
 
 		for (int i = 0; i < vClientSockets.size(); i++)
 		{
-			res = Socket::setSocketOptTimeout(vClientSockets[i], 10);
+			res = Socket::setSocketOptTimeout(vClientSockets[i], 5);
 		}
-
-		pthread_mutex_lock(&lock);
 
 		vector<bool> vVotes;
 		vector<string> vServerResponses;
@@ -211,6 +218,7 @@ bool Coordinator::setupDistributedSystem()
 			cout << "\n[ERROR ] " << __func__;
 			res =  false;
 		}
+		cout << "\n[ INFO ] Connected to server on port " << vClientSockets[i].iPortNum;
 	}
 
 	return res;
@@ -304,7 +312,7 @@ bool Coordinator::runServer()
 
 		Socket::accept(server, *newSocket);
 		Socket::recvData(*newSocket, sClientData);
-
+		cout << "\n[ INFO ] Received " << sClientData.c_str();
 		if(pthread_create(&threadId, NULL, Coordinator::connection_handler, (void*)(&sClientData)))
 		{
 			cout << "\n[ERROR ] " << __func__;

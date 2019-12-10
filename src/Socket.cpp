@@ -11,13 +11,13 @@
 using std::cout;
 using std::string;
 
-bool Socket::setSocketOptTimeout(SocketData& s, int iTimeoutInMicroSeconds)
+bool Socket::setSocketOptTimeout(SocketData& s, int iTimeoutInSeconds)
 {
 	bool res = true;
 
 	struct timeval tv;
-	tv.tv_sec = 0;
-	tv.tv_usec = iTimeoutInMicroSeconds;
+	tv.tv_sec = iTimeoutInSeconds;
+	tv.tv_usec = 0;
 	if(setsockopt(s.iSocket, SOL_SOCKET, SO_RCVTIMEO, (const char*)&tv,sizeof(struct timeval)) < 0)
 	{
 		cout << "\n[ERROR ] setsockopt failed on setting recv timeout";
