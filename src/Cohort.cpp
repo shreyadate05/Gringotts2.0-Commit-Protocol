@@ -155,24 +155,32 @@ bool Cohort::exit()
 	return res;
 }
 
+bool Cohort::getTransaction(SocketData& newSocket)
+{
+	bool res = true;
+
+	res = Socket::recvData(newSocket, sCommand);
+	if (!res)
+	{
+		cout << "\n[ERROR ] Socket error occurred while receiving transaction.";
+	}
+	cout << "\n[ INFO ] Received transaction \"" << sCommand.c_str() << "\" from Coordinator";
+
+	return res;
+}
+
 bool Cohort::isReady(SocketData& newSocket)
 {
 	bool res = true;
 	string sReady;
 
-	// coordinator sends message in the format <client_request|READY?>
 	res = Socket::recvData(newSocket, sReady);
 	if (!res)
 	{
-		cout << "\n[ERROR ] Socket error occurred. Exiting client.";
+		cout << "\n[ERROR ] Socket error occurred while receiving voting message from server.";
 	}
-	cout << "\n[ INFO ] Received voting message " << sReady.c_str() << " from Coordinator";
+	cout << "\n[ INFO ] Received voting message \"" << sReady.c_str() << "\" from Coordinator";
 
-	char  cDeLim = '|';
-	vector<string> vMessage = StringUtilities::StringSplitByDelim(sReady, cDeLim);
-	(vMessage.size() != 2) ? sReady = "FAIL" : sReady = "OK";
-
-	sCommand = vMessage[0];
 	res = Socket::sendData(socketData, sReady.c_str());
 	if (!res)
 	{
@@ -259,6 +267,7 @@ bool Cohort::runServer()
 		newSocket->sHostname = socketData.sHostname;
 
 		res = Socket::accept(socketData, *newSocket);
+		res = getTransaction(*newSocket);
 		res = isReady(*newSocket);
 		res = finalCall(*newSocket);
 

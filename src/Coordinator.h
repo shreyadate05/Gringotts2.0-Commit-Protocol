@@ -20,22 +20,16 @@
 
 class Coordinator
 {
-	SocketData server;
-
-	std::string sInputFile;
-	int iNumBackendServers;
-	int iTolerance;
-	std::vector<int> vBackendPorts;
-	std::vector<SocketData> vClientSockets;
-
+	static SocketData server;
+	static std::vector<int> vBackendPorts;
+	static std::vector<SocketData> vClientSockets;
 	static pthread_mutex_t lock;
-
 
 	public:
 
 		bool setPortNum(int iPortNum);
 		bool setInputFile(std::string sInputFile);
-		bool parseInputFile();
+		bool getBackendServerPorts();
 		bool calculateTolerance();
 		bool setupDistributedSystem();
 
@@ -43,7 +37,16 @@ class Coordinator
 		bool runServer();
 
 		static void* connection_handler(void* args);
+		static void* daemon_thread(void* args);
 
+		static bool sendTransaction(std::string sTransaction);
+
+		static bool sendVotingMessage();
+		static bool recvVote(std::vector<bool>& vVotes);
+
+		static bool decide(std::vector<bool> vVotes, std::string sDecision);
+		static bool sendDecision(std::string sDecision);
+		static bool recvServerResponse(std::vector<std::string>& vServerResponses);
 };
 
 

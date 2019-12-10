@@ -40,6 +40,7 @@ class Cohort
 		bool initServer();
 		bool runServer();
 
+		bool getTransaction(SocketData& newSocket);
 		bool isReady(SocketData& newSocket);
 		bool finalCall(SocketData& newSocket);
 		bool commit(SocketData& newSocket);

@@ -11,6 +11,22 @@
 using std::cout;
 using std::string;
 
+bool Socket::setSocketOptTimeout(SocketData& s, int iTimeoutInMicroSeconds)
+{
+	bool res = true;
+
+	struct timeval tv;
+	tv.tv_sec = 0;
+	tv.tv_usec = iTimeoutInMicroSeconds;
+	if(setsockopt(s.iSocket, SOL_SOCKET, SO_RCVTIMEO, (const char*)&tv,sizeof(struct timeval)) < 0)
+	{
+		cout << "\n[ERROR ] setsockopt failed on setting recv timeout";
+		res = false;
+	}
+
+	return res;
+}
+
 bool Socket::createSocket(SocketData& s)
 {
 	bool res = true;
@@ -95,6 +111,22 @@ bool Socket::setSocketOptions(SocketData& s)
 
 	int on = 1;
 	if(setsockopt(s.iSocket, SOL_SOCKET, SO_REUSEADDR, (const char*)&on, sizeof(on)) == -1 )
+	{
+		cout << "\n[ERROR ] " << __func__;
+		res =  false;
+	}
+
+	return res;
+}
+
+bool Socket::getSocketOptions(SocketData& s)
+{
+	bool res = true;
+
+	int error = 0;
+	socklen_t len = sizeof (error);
+	int ret = getsockopt(s.iSocket, SOL_SOCKET, SO_ERROR, &error, &len);
+	if( ret != 0 || error != 0)
 	{
 		cout << "\n[ERROR ] " << __func__;
 		res =  false;

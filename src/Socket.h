@@ -22,6 +22,8 @@ class Socket
 		static bool listen(SocketData& s);
 		static bool accept(SocketData& oldSock, SocketData& newSock);
 		static bool setSocketOptions(SocketData& s);
+		static bool getSocketOptions(SocketData& s);
+		static bool setSocketOptTimeout(SocketData& s, int iTimeoutInMicroSeconds);
 
 		static bool connect(SocketData& s);
 		static bool closeSocket(SocketData& s);

@@ -16,18 +16,13 @@ int main(int argc, char* argv[])
 {
 	Coordinator c;
 
-	if (argc != 3)
+	if (argc != 2)
 	{
 		cout << "\n[ERROR ] Invalid command line arguments.";
 		return -1;
 	}
 
 	c.setPortNum(std::stoi(argv[1]));
-	if (!c.setInputFile(argv[2]))
-	{
-		cout << "\n[ERROR ] Failed to parse input file.";
-		return -1;
-	}
 
 	if (!c.initServer())
 	{

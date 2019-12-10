@@ -93,6 +93,7 @@ bool Client::runClient()
 		{
 			bKeepAlive = false;
 			cout << "\n[ INFO ] Exiting client";
+			break;
 		}
 
 		res = Socket::sendData(socketData, sCommand.c_str());
