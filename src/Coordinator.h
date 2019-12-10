@@ -11,29 +11,39 @@
 #include "SocketDefs.h"
 #include "Socket.h"
 #include <pthread.h>
+#include <string.h>
+#include <string>
 #include <vector>
-
+#include <fstream>
+#include <sstream>
+#include <map>
 
 class Coordinator
 {
-	SocketData socketData;
+	SocketData server;
+
+	std::string sInputFile;
+	int iNumBackendServers;
+	int iTolerance;
+	std::vector<int> vBackendPorts;
+	std::vector<SocketData> vClientSockets;
+
 	static pthread_mutex_t lock;
+
 
 	public:
 
-		bool setHostname(std::string sHostname);
 		bool setPortNum(int iPortNum);
-		bool initServerData();
-		bool startServer();
+		bool setInputFile(std::string sInputFile);
+		bool parseInputFile();
+		bool calculateTolerance();
+		bool setupDistributedSystem();
+
+		bool initServer();
 		bool runServer();
-		bool exitServer();
 
 		static void* connection_handler(void* args);
-		static bool transact(std::string sRecord);
-		static bool withdraw(long long llAccountNumber, long long llAmount);
-		static bool deposit(long long llAccountNumber, long long llAmount);
-		static std::vector<std::string> StringSplitByDelim(std::string str, char& cDeLim);
-		static bool printAccountData();
+
 };
 
 

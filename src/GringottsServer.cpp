@@ -14,6 +14,33 @@ using std::cout;
 
 int main(int argc, char* argv[])
 {
+	Coordinator c;
+
+	if (argc != 3)
+	{
+		cout << "\n[ERROR ] Invalid command line arguments.";
+		return -1;
+	}
+
+	c.setPortNum(std::stoi(argv[1]));
+	if (!c.setInputFile(argv[2]))
+	{
+		cout << "\n[ERROR ] Failed to parse input file.";
+		return -1;
+	}
+
+	if (!c.initServer())
+	{
+		cout << "\n[ERROR ] Failed to initialize server.";
+		return -1;
+	}
+
+	if (!c.runServer())
+	{
+		cout << "\n[ERROR ] Something went wrong in the server.";
+		return -1;
+	}
+
 
 	std::cout << std::endl;
 	return 0;

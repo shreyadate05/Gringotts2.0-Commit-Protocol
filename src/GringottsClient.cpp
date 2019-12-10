@@ -19,6 +19,7 @@ int main(int argc, char* argv[])
 	if (argc != 3)
 	{
 		cout << "\n[ERROR ] Invalid command line arguments.";
+		return -1;
 	}
 
 	c.setPortNum(std::stoi(argv[1]));
