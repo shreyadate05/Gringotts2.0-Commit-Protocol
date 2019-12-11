@@ -246,6 +246,23 @@ bool Backend::abort(SocketData& newSocket)
 	return res;
 }
 
+bool Backend::getLocalDecision()
+{
+	bool res = true;
+
+	int iRand = (rand() % 9) + 1;
+	if (iRand == 3 || iRand == 6 || iRand == 9)
+	{
+		sLocalDecision = "ABORT";
+	}
+	else
+	{
+		sLocalDecision = "COMMIT";
+	}
+
+	return res;
+}
+
 bool Backend::initClient()
 {
 	bool res = true;
@@ -286,8 +303,9 @@ bool Backend::runClient()
 		res = Socket::recvData(newSocket, sReady);
 		cout << "\n[ INFO ] Received voting message \"" << sReady.c_str() << "\" from Coordinator";
 
-		res = Socket::sendData(socketData, "OK");
-		cout << "\n[ INFO ] Sent \'OK\' back to Coordinator";
+		res = getLocalDecision();
+		res = Socket::sendData(socketData, sLocalDecision);
+		cout << "\n[ INFO ] Sent local decision to "<< sLocalDecision << " back to Coordinator";
 
 
 		res = Socket::recvData(newSocket, sDecision);
@@ -296,7 +314,7 @@ bool Backend::runClient()
 
 		res = (sDecision == "COMMIT") ? commit(newSocket) : abort(newSocket);
 
-		cout << "\n[ INFO ] After commit";
+		sOutput = sOutput + "\r\n";
 		res = Socket::sendData(socketData, sOutput);
 		cout << "\n[ INFO ] Sent \'" << sOutput << "\' back to Coordinator";
 

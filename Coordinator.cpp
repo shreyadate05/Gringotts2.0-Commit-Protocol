@@ -150,6 +150,9 @@ void* Coordinator::connection_handler(void* args)
 
 	while (true)
 	{
+		vServerResponses.clear();
+		vVotes.clear();
+		sDecision = "";
 		pthread_mutex_lock(&lock);
 
 		cout << "\n[ INFO ]In thread handler for socket " << newConn->iSocket;
@@ -182,6 +185,7 @@ void* Coordinator::connection_handler(void* args)
 		}
 
 		usleep(50000);
+		vVotes.clear();
 		for (int i = 0; i < vClientSockets.size(); i++)
 		{
 			string sVote;
@@ -194,7 +198,7 @@ void* Coordinator::connection_handler(void* args)
 			}
 			cout << "\n[ INFO ] Received vote of server on fd " << vClientSockets[i].iSocket;
 
-			if (sVote == "OK")
+			if (strcmp(sVote.c_str(), "COMMIT") == 0)
 				vVotes.push_back(true);
 			else
 				vVotes.push_back(false);
@@ -202,12 +206,17 @@ void* Coordinator::connection_handler(void* args)
 
 		usleep(50000);
 		int iCount = 0;
+		bool flag = true;
 		for (int i = 0; i < vVotes.size(); i++)
 		{
 			if (!vVotes[i])
 				iCount++;
 		}
 		sDecision = (iCount > 1) ? "ABORT" : "COMMIT";
+		if (strcmp(sDecision.c_str(), "ABORT") == 0)
+		{
+			flag = false;
+		}
 
 		usleep(50000);
 		for (int i = 0; i < vClientSockets.size(); i++)
@@ -219,34 +228,55 @@ void* Coordinator::connection_handler(void* args)
 				res = false;
 				break;
 			}
-			cout << "\n[ INFO ] Sent decision to server on fd " << vClientSockets[i].iSocket;
+			cout << "\n[ INFO ] Sent decision to " << sDecision << " server on fd " << vClientSockets[i].iSocket;
 		}
 
 		usleep(50000);
-		for (int i = 0; i < vClientSockets.size(); i++)
+		string sDecison  = "";
+		vServerResponses.clear();
+
+		// if local decision of backend servers was "COMMIT", then expect a response
+		if (flag)
 		{
-			string sAck;
-			res = Socket::recvData(vClientSockets[i], sAck);
+
+			for (int i = 0; i < vClientSockets.size(); i++)
+			{
+				string sAck;
+				res = Socket::recvData(vClientSockets[i], sAck);
+				if (!res)
+				{
+					cout << "\n[ERROR ] Failed to receive response from server on fd " << vClientSockets[i].iSocket;
+					res = false;
+					break;
+				}
+				sDecison = sAck;
+				vServerResponses.push_back(sAck);
+				cout << "\n[ INFO ] Received response of server on fd " << vClientSockets[i].iSocket;
+
+
+				res = Socket::sendData(*newConn, sDecison);
+				if (!res)
+				{
+					cout << "\n[ERROR ] Failed to send decision to server on port number " << newConn->iSocket;
+					res = false;
+					break;
+				}
+				cout << "\n[ INFO ] Sent decision to client on fd " << newConn->iSocket;
+
+			}
+		}
+		else
+		{
+			sDecison = "Transaction failed \n\r";
+			res = Socket::sendData(*newConn, sDecison);
 			if (!res)
 			{
-				cout << "\n[ERROR ] Failed to receive response from server on fd " << vClientSockets[i].iSocket;
+				cout << "\n[ERROR ] Failed to send decision to server on port number " << newConn->iSocket;
 				res = false;
 				break;
 			}
-			vServerResponses.push_back(sAck);
-			cout << "\n[ INFO ] Received response of server on fd " << vClientSockets[i].iSocket;
-
 		}
 
-
-		res = Socket::sendData(*newConn, vServerResponses[0]);
-		if (!res)
-		{
-			cout << "\n[ERROR ] Failed to send decision to server on port number " << newConn->iSocket;
-			res = false;
-			break;
-		}
-		cout << "\n[ INFO ] Sent decision to server on fd " << newConn->iSocket;
 
 		pthread_mutex_unlock(&lock);
 	}

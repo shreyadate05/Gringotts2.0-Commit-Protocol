@@ -23,6 +23,7 @@ class Backend
 
 	std::map<int, long long> mAccounts;
 	std::string sCommand;
+	std::string sLocalDecision;
 	std::string sTransaction;
 	std::vector<std::string> vCommands;
 	int iAccountNumber;
@@ -42,6 +43,7 @@ class Backend
 
 		bool readCommand();
 		bool parseCommand();
+		bool getLocalDecision();
 		bool runClient();
 
 
